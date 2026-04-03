@@ -1,0 +1,119 @@
+FUNCTIONAL REQUIREMENTS DOCUMENT (FRD) 
+Project Title: Project Pokedex (subject to change) 
+1. Introduction 
+This document describes the functional requirements of the system. 
+It defines what the system shall do and the features it will provide to users 
+2. System Overview 
+The system is a web application developed to: 
+● Handle real-time image recognition using YOLOv8 and CLIP. 
+● Secure user authentication and personalized collection storage. 
+● Allow Users to browse, organize, and manage their collections. 
+● Display card metadata retrieved from external APIs. 
+● Have voice-assisted interaction for accessibility and engagement.  
+3. Functional Requirements 
+The functional requirements are listed below in “The system shall…” format. 
+FR-1 
+The system shall allow users to scan and identify cards in their collection. 
+FR-2 
+The system shall display relevant card data to the user such as trade and meta information. 
+FR-3 
+The system shall allow users to create profiles for account management. 
+FR-3 
+The system shall store data related to card information, user emails, and authentication keys in 
+the database. 
+FR-4 
+The system shall allow users to interact with AI agent to further assist with card information 
+acquisition. 
+FR-5 
+The system shall allow users to delete their scan, user, and app data. 
+FR-6 
+The system shall use generative AI for improving accessibility to users with voice assistance and 
+generative text. 
+4. Feature Classification 
+Required Features 
+ID 
+Requirement 
+Description 
+A01 Card scanning with ML 
+A02 Card quality identifier 
+Identify cards with 90% accuracy using machine 
+learning. 
+Detect and determine the value of a card based 
+on the condition it has kept. How defective or 
+imperfect its surface and its foil quality (Holo, 
+reverse holo, regular) 
+Priority 
+High 
+ 
+A02 Interactive AI agent Vocally and textually guides users through the 
+application, enhancing user engagement. 
+High 
+A03 Text and metadata relay Provides accurate and up-to-date card 
+information. 
+High 
+A04 Text to speech Converts text information to audible feedback 
+for enhanced accessibility. 
+High 
+A05 Profile creation Allows users to create and manage 
+personalized profiles. 
+High 
+A06 Phone camera access and 
+use 
+Ensures seamless integration with device 
+camera functionality. 
+High 
+A07 Library of previous scans Stores and organizes past scanned cards for 
+user reference. 
+High 
+A08 WCAG compliant 
+accessibility settings 
+Guarantees an inclusive experience for all 
+users. 
+High 
+Desired Features 
+ID Requirement Description Priority 
+B01 Expanded AI voice Guides users through the application with 
+generative tutorialization and accessibility 
+Medium 
+ 
+interactions for enhancing user engagement and 
+usability. 
+B02 Comprehensive card 
+library 
+Includes an extensive range of cards in the 
+Trading Card Game (TCG). 
+Medium 
+B03 Additional accessibility 
+features 
+Offers enhanced user support for outlier 
+conditions and disabilities. 
+Medium 
+Aspirational Features 
+ID Requirement Description Priority 
+C01 Customizable themes Allows users to personalize the user interface 
+according to their preferences. 
+Low 
+C02 Unlockable card sleeves Enhances user collection by offering unique 
+sleeve designs. 
+Low 
+C03 Animated libraries Provides a more dynamic and engaging visual 
+experience. 
+Low 
+C04 Interactive card viewer Offers immersive exploration of card details and 
+features. 
+Low 
+C05 Sound effects and AI 
+reactions 
+Enriches user experience with additional auditory 
+elements. 
+Low 
+5. Non-Functional Requirements 
+● The system shall be user-friendly. 
+● The system shall load within 3 seconds. 
+● The system shall ensure data security. 
+● The system shall be reliable and available when required. 
+6. System Architecture 
+The system follows a three-tier architecture: 
+● Presentation Layer (User Interface) 
+● Business Logic Layer 
+● Data Layer (Database)
