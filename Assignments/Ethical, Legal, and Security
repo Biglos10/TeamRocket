@@ -1,0 +1,58 @@
+Carlos, Ghosti, Uma, Blake, Noor
+
+Ethical Issues
+ Project Ethics for Development and Use
+Data minimalization
+•	Risk (low): Currently the application will only have access to user credentials for log in, user scans, and the cards in the collection which represent the total available cards the application is trained to identify. Data usage concerns regarding the ethicality of the model is low, image identification models have been trained far before the existence of emergent data centers and the technology shows no significant ethical concern in its data usage. It also is trained on an open source community supported API so no images or data was acquired without the express permission of users whose content was posted for the purpose of free and fair use. Supabase will handle the vast majority of data storage. While cloud servers pose a potential ethical concern, the environmental or social impact is overall lower than an in-house hosted server.
+•	Prevention: No discernible action can be taken to mitigate this risk.
+
+Legal Issues
+ Project Legality
+Copyright
+•	Risk(Critical): The Pokémon artwork and images belong to the Pokémon company, using open source API’s based on their legal trademark could potentially lead to breach of copyright or other legal ramifications.
+•	Prevention: The best method of prevention is to avoid any official publicly available release of the application in order to avoid potential legal ramifications.
+Legal containment of user data
+•	Risk(medium): User Data, regardless of sensitivity, is in certain cases a legal right, such as data privacy laws in California and Great Britain which protects user access to their own data.
+•	Prevention: Best practice is to allow users the powers to access their data and provide a path by which any user may request to have their data sent to them or deleted.
+Inaccurate trade data
+•	Risk(low): If trade data is misleading or fraudulent, it could entice users into participating in fraudulent transactions. Though the application does not feature a trade platform and bears no responsibility for use of the data provided (which is provided by third party API’s), there could be certain situations in which the app could be civilly liable for inaccurate trades.
+•	Prevention: insert disclaimer of potential inaccurate information and provide citation for data sources in the application. Unfortunately however, as the data used to inform on the trade data does not belong to us, we have no power to change it ourselves and so no further prevention methods will be employed currently.
+3rd party compliance
+Below are components you’ve listed and the typical licenses
+•	Vue.js - MIT.
+•	Tailwind CSS - MIT.
+•	Flask - BSD or MIT (verify).
+•	PyTorch - BSD-style (PyTorch license).
+•	YOLOv8 / Ultralytics - Ultralytics repo has a specific license; check for commercial use restrictions.
+•	OpenAI CLIP - OpenAI license; some models have research-only limitations historically - verify.
+•	OpenAI API - commercial service with paid terms; must follow acceptable use and data usage policies.
+•	Supabase - platform service and client libs; check Terms of Service / Data Processing Agreement.
+•	Pokémon TCG SDK / API - likely has API terms and maybe limitations on caching/redistribution; Pokémon IP is owned by third parties.
+•	Docker - Apache 2.0 / Docker licensing.
+
+Security Issues
+ Project Security
+User privacy
+•	Risk(high): User data such as log in information and card scans will be stored using Supabase. This information contains sensitive information that could jeopardize the privacy of users if not securely stored.
+•	Prevention: We’ve put trust in the authentication, and secure storage practices of the host database Supabase and their Cloud storage solution.
+Possible Attack Vectors & Mitigations
+XSS (cross-site scripting)
+•	Mitigation: Escape/encode all user-generated content displayed in the UI; use frameworks’ safe templating; set CSP headers.
+CSRF (cross-site request forgery)
+•	Mitigation: Use CSRF tokens for state-changing endpoints, or rely on same-site cookies and JWT in the Authorization header.
+SQL injection
+•	Mitigation: Use parameterized queries. Avoid building SQL by concatenation.
+Insecure file uploads (malicious content, huge files)
+•	Mitigation: Check file signatures, set size limits, generate secure signed URLs for access. Strip EXIF metadata if privacy-sensitive.
+SSRF (server side request forgery) via URLs in uploaded metadata or external API calls
+•	Mitigation: Validate/whitelist domains, restrict outgoing network egress from backend containers, use DNS controls and HTTP timeouts.
+Privilege escalation / exposed admin endpoints
+•	Mitigation: Protect admin APIs with additional auth layers; log all admin actions.
+Secrets leakage in images or builds
+•	Mitigation: Build images in CI with secrets injected at runtime, scan images for secrets, use small base images and non-root containers.
+Dependency / supply chain attacks
+•	Mitigation: Pin dependency versions, use SCA (software composition analysis) tools, regularly run vulnerability scans (e.g., Dependabot, Snyk), review install scripts.
+Model adversarial attacks & data poisoning
+•	Mitigation: Do not auto-train on user-submitted content without vetting, keep an isolated training pipeline, and test model robustness. Monitor for anomalous query patterns and rate-limit to prevent extraction.
+
+
