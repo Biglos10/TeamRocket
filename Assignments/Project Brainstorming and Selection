@@ -1,0 +1,148 @@
+Team Organization 
+Team Rocket 
+Startup college machine learning production group focused on the development of the AI 
+powered web application Project Pokédex. 
+Team Members 
+• Ghosti Matas: UX Designer, Assistant Database programmer, 
+• Blake Mosley: Backend and machine learning model dev 
+• Uma Desai: Database and cloud service engineer 
+• Carlos Diaz: Team/Project Management, Frontend dev 
+• Nura Mouktar: Frontend dev 
+Project Description and Requirements 
+Welcome to the TeamRocket wiki! 
+Team Rocket 
+Startup college machine learning production group focused on the development of the AI 
+powered web application Project Pokédex. 
+Team Members 
+• Ghosti Matas: Frontend Developer/UX Researcher 
+• Blake Mosley: Backend Developer 
+• Uma Desai: Project Management/Repo Host 
+• Carlos Diaz: QA 
+• Nura Mouktar: QA All Programming with Python 
+Project Pokédex 
+by Team Rocket 
+Description 
+Project Pokédex is an interactive web application that combines computer vision, machine 
+learning, and accessible design to create an engaging, educational card collection 
+experience. The system is built as a modular web platform consisting of four primary 
+layers: the frontend interface, backend services, machine learning engine, and data storage 
+infrastructure. 1. Frontend (User Interface): The frontend is a responsive web interface 
+optimized for mobile and tablet devices. It allows users to scan cards via their device 
+camera, view card details, manage their profile, and access a personal library of past 
+scans. Accessibility is a core focus — all UI components will meet WCAG 2.1 compliance. 
+2. Backend (Application Server): The backend manages user authentication, and data 
+handling, and retrieving relevant metadata, such as card value, set number, and trading 
+details, from a central card database or third-party APIs, ensuring that users receive 
+accurate and real-time information. 3. Machine Learning Engine: At the heart of Project 
+Pokédex is the image recognition module. This processes live or uploaded images to 
+identify cards. The model is trained on a comprehensive dataset of Pokémon Trading Card 
+Game (TCG) images to identify cards with at least 90% accuracy. The engine provides 
+classification results, which are then paired with additional metadata and relayed to the 
+user. 4. Data Storage & User Profiles: User data is securely stored in cloud storage solution 
+hosted and maintained by Supabase. Each user’s scan library allows them to revisit 
+previous identifications, view trends, and organize their collection. All personal data 
+follows best practices in encryption and storage security. 5. Audio Interaction Layer (AI 
+Voice Interlude): A lightweight audio subsystem provides dynamic voice feedback for scans 
+to emulate the classic anime experience. This component utilizes OpenAI API to convert a 
+card synopsis into spoken feedback, making the app more accessible and immersive. 6. 
+System Architecture Overview: The architecture follows a client-server model, where the 
+client (web app user) communicates with backend APIs on Supabase to handle 
+authentication, data retrieval, and ML inference requests. The ML model can be hosted on 
+a separate inference service (TBD) for scalable performance. 
+Architecture Overview 
+Frontend 
+• Languages: HTML, CSS, JavaScript 
+• Frameworks: Vue JS, Tailwind CSS 
+• API’s: HTML5 media devices API 
+• Role: UI/UX, image capture/upload, user authentication interfaces, and displaying 
+card metadata. 
+Backend 
+• Language: Python 
+• Framework: FastAPI, Pytorch 
+• Software tools: Pokémon TCG SDK, TCGCSV 
+• Serverless Compute: AWS Lambda 
+• Role: Handling API requests, routing, business logic, ML model interaction, and 
+communication with the database. 
+Database/Service 
+• Database: AWS DynamoDB 
+• API: Pokémon TCG SDK Card data API 
+• Storage: AWS DynamoDB 
+• Role: User profiles, authentication data, and saved card collection data. 
+ML APIs 
+• YOLO v8: Object detection for card identification. 
+• CLIP: Image-text matching to enhance card recognition accuracy. 
+• VertexAI(LLM): Conversational AI Agent and voice relay integration. 
+High-Level Flow: 
+• The user opens the web app and logs in using a mobile device of their choice. 
+• The user scans a Pokémon or One Piece card using the camera. 
+• The image is sent to the backend for preprocessing and ML inference. 
+• The ML model identifies the card and returns metadata. 
+• The backend fetches supplementary details (trade value, set, etc.). 
+• The frontend displays results and delivers real time generative vocal feedback. 
+• The scan and metadata are stored in the user’s profile for future access. 
+Core Features 
+ID Requirement Description Priority 
+A01 Card scanning with ML Identify cards with 90% accuracy using 
+machine learning. High 
+A02 AI voice interlude Engages users with dynamic audio 
+feedback. High 
+A03 Text and data relay Provides accurate and up-to-date card 
+information. High 
+A04 Text to speech Converts text information to audible 
+feedback for enhanced accessibility. High 
+A05 Profile creation Allows users to create and manage 
+personalized profiles. High 
+A06 Phone camera access 
+and use 
+Ensures seamless integration with 
+device camera functionality. High 
+A07 Library of previous 
+scans 
+Stores and organizes past scanned 
+cards for user reference. High 
+A08 WCAG compliant 
+accessibility settings 
+Guarantees an inclusive experience for 
+all users. High 
+Desired Features 
+ID Requirement Description Priority 
+B01 Interactive AI agent Guides users through the application, 
+enhancing user engagement. Medium 
+B02 Comprehensive card 
+library 
+Includes an extensive range of cards in 
+the Trading Card Game (TCG). Medium 
+ID Requirement Description Priority 
+B03 Additional accessibility 
+features 
+Offers enhanced user support for 
+outlier conditions and disabilities. Medium 
+Aspired Features 
+ID Requirement Description Priority 
+C01 Customizable 
+themes 
+Allows users to personalize the user 
+interface according to their preferences. Low 
+C02 Unlockable card 
+sleeves 
+Enhances user collection by offering 
+unique sleeve designs. Low 
+C03 Animated libraries Provides a more dynamic and engaging 
+visual experience. Low 
+C04 Interactive card 
+viewer 
+Offers immersive exploration of card 
+details and features. Low 
+C05 Sound effects and AI 
+reactions 
+Enriches user experience with additional 
+auditory elements. Low 
+Functional Requirements 
+• Card scanning accuracy of 90% or higher. 
+• 100% accuracy in information relayed to users. 
+Non-Functional Requirements 
+• Application responsiveness with a 300 millisecond response time. 
+• User data must be stored securely. 
+• Compliance with WCAG 2.1 accessibility standards. 
+• Reliable accessibility with minimal downtime. 
+• Responsive design optimized for phones and tablets.
