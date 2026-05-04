@@ -6,15 +6,15 @@ export function useAuth() {
   const { setScreen, currentUser, activeScreen, resetButtons } = useAppState()
   const { loadScans } = useLibraryStore()
 
-  // ── Check for an existing session on app load ─────────────────────────────
+  // ---Check for an existing session on app load---
   async function checkSession() {
     const { data: { session } } = await supabase.auth.getSession()
     if (session?.user) {
       currentUser.value = session.user
-      setScreen('default')
+      setScreen(null)
       loadScans()
     } else {
-      // Show welcome screen first, then slide into login
+      // ---Show welcome screen first, then slide into login---
       setScreen('welcome')
       setTimeout(() => {
         if (activeScreen.value === 'welcome') setScreen('login')
@@ -22,7 +22,7 @@ export function useAuth() {
     }
   }
 
-  // ── Boot sequence: shown after a fresh login ──────────────────────────────
+  // ---Boot sequence: shown after a fresh login---
   function _bootSequence(user) {
     currentUser.value = user   // triggers app brightening transition immediately
     setScreen('booting')
@@ -32,14 +32,14 @@ export function useAuth() {
     }, 2000)
   }
 
-  // ── Sign in with email + password ─────────────────────────────────────────
+  // ---Sign in with email + password----
   async function login(email, password) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
     _bootSequence(data.user)
   }
 
-  // ── Create a new account ──────────────────────────────────────────────────
+  // ---Create a new account---
   // NOTE: disable "Enable email confirmations" in Supabase Auth settings so
   // the user is logged in immediately after signup without an email click.
   async function signup(email, password) {
@@ -51,18 +51,18 @@ export function useAuth() {
     return data
   }
 
-  // ── Sign out (instant) ────────────────────────────────────────────────────
+  // ---Sign out (instant)---
   async function logout() {
     await supabase.auth.signOut()
     currentUser.value = null
     setScreen('login')
   }
 
-  // ── Boot-down sequence: dims app first, then enters login ─────────────────
+  // ---Boot-down sequence: dims app first, then enters login---
   async function bootDown() {
     resetButtons()                    // deactivate all buttons before dimming
     await supabase.auth.signOut()
-    setScreen(null)                   // clear screen during the dim transition
+    setScreen('default')                   // clear screen during the dim transition
     currentUser.value = null          // triggers 2s dim CSS transition immediately
     setTimeout(() => {
       if (!currentUser.value) setScreen('login')
