@@ -162,7 +162,15 @@
     <!--camera-->
     <div v-if="currentPage === 'camera'" class="page camera-page">
       <div class="camera-box">
-        <video ref="videoRef" autoplay playsinline></video>
+        <div class="camera-output">
+          <!--Camera view-->
+          <video ref="videoRef" autoplay playsinline :style="{display: cameraActive ? 'block':'none'}"></video>
+          <!--Capture view-->
+          <div v-if="!cameraActive" class="result-images">
+            <img v-if="lastCapture" :src="lastCapture"/>
+            <img v-if="lastResultImage" :src="lastResultImage"/>
+          </div>
+        </div>
         <div class="camera-controls">
           <button @click="toggleCamera">{{ cameraActive ? 'Stop Camera' : 'Start Camera' }}</button>
           <button @click="capturePhoto" :disabled="!cameraActive">Capture</button>
@@ -189,12 +197,6 @@
             <div class="scan-info">
               <p class="scan-name">
                 {{ scan.cardName || 'Unknown card' }}
-              </p>
-              <p v-if="scan.confidence != null" class="scan-confidence">
-                Confidence: {{ (scan.confidence * 100).toFixed(1) }}%
-              </p>
-              <p v-if="scan.cardId != null" class="scan-id">
-                Card ID: {{ scan.cardId }}
               </p>
             </div>
           </div>
@@ -228,8 +230,12 @@
   margin-bottom: 15px;
 }
 
-.toolbar-buttons button {
-  margin-left: 5px;
+button {
+  margin-left: 10px;
+  border: 2px solid black;
+  padding: 2px 5px;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
 /* --- Camera box --- */
@@ -243,6 +249,7 @@
   width: 100%;
   max-height: 300px;
   background: #000;
+  transform: scaleX(-1);
 }
 
 .camera-controls {
