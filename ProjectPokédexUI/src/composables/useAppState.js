@@ -16,6 +16,7 @@ const confirmStep    = ref(null)   // null | 'scan' | 'ownership'
 const pendingCardId  = ref(null)   // card_id currently awaiting confirmation
 const pendingCard    = ref(null)   // full cardinfo row held between confirmation phases
 const pendingImageUrl = ref(null)  // image URL held between confirmation phases
+const pendingLibraryId = ref(null) // existing library row id when re-confirming ownership (re-scan flow)
 
 export function useAppState() {
   function setScreen(screen) {
@@ -33,6 +34,6 @@ export function useAppState() {
     profileActive, activeSettings,
     resetButtons,
     scannedCard, cardMeta, cardTrade, scanStatus,
-    confirmStep, pendingCardId, pendingCard, pendingImageUrl,
+    confirmStep, pendingCardId, pendingCard, pendingImageUrl, pendingLibraryId,
   }
 }

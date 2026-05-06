@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase.js'
 import { useAppState } from './useAppState.js'
+import { useLibraryStore } from './useLibraryStore.js'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -10,8 +11,15 @@ function toArray(v) {
   return String(v).split(',').map(s => s.trim()).filter(Boolean)
 }
 
+function cardImageUrl(setId, number) {
+  if (!setId || !number) return null
+  const num = String(number).split('/')[0]
+  return `https://images.pokemontcg.io/${setId}/${num}_hires.png`
+}
+
 export function useCardScanner() {
-  const { scannedCard, cardMeta, cardTrade, scanStatus, setScreen, activeSettings, profileActive, confirmStep, pendingCardId, pendingCard, pendingImageUrl, currentUser } = useAppState()
+  const { scannedCard, cardMeta, cardTrade, scanStatus, setScreen, activeSettings, profileActive, confirmStep, pendingCardId, pendingCard, pendingImageUrl, pendingLibraryId, currentUser } = useAppState()
+  const { loadScans } = useLibraryStore()
 
   // ── Full data fetch: attacks + set + price ────────────────────────────────
   // Called immediately for known cards, or after scan confirmation for new ones
@@ -50,25 +58,44 @@ export function useCardScanner() {
     // Check if this user already has this card in their library
     const { data: libraryEntry } = await supabase
       .from('library')
-      .select('id')
+      .select('id, tag')
       .eq('card_id', cardId)
       .eq('user_id', currentUser.value?.id)
       .maybeSingle()
 
-    if (libraryEntry) {
-      // Known card — fetch all data now, no confirmation needed
+    if (libraryEntry?.tag === 'owned') {
+      // Already owned — fetch all data, no confirmation needed
       await fetchCardData(card)
-      confirmStep.value   = null
-      pendingCardId.value = null
-      pendingCard.value   = null
-      pendingImageUrl.value = null
+      confirmStep.value      = null
+      pendingCardId.value    = null
+      pendingCard.value      = null
+      pendingImageUrl.value  = null
+      pendingLibraryId.value = null
+    } else if (libraryEntry?.tag === 'unowned') {
+      // Previously unowned — log the scan as known and prompt for ownership update
+      await fetchCardData(card)
+      const { error: scanErr } = await supabase.from('scans').insert({
+        user_id:   currentUser.value?.id,
+        card_id:   cardId,
+        tag:       'known',
+        image_url: imageUrl,
+      })
+      if (scanErr) console.error('[CardScanner] rescan scan insert', scanErr)
+      else loadScans()
+
+      pendingCard.value      = card
+      pendingImageUrl.value  = imageUrl
+      pendingCardId.value    = cardId
+      pendingLibraryId.value = libraryEntry.id
+      confirmStep.value      = 'ownership'
     } else {
       // New card — hold the card row for phase 2, wait for user confirmation
       // before hitting attacks / sets / tcgplayer
-      pendingCard.value     = card
-      pendingImageUrl.value = imageUrl
-      pendingCardId.value   = cardId
-      confirmStep.value     = 'scan'
+      pendingCard.value      = card
+      pendingImageUrl.value  = imageUrl
+      pendingCardId.value    = cardId
+      pendingLibraryId.value = null
+      confirmStep.value      = 'scan'
     }
 
     // Switch to card viewer with Settings1 lit
@@ -117,8 +144,7 @@ export function useCardScanner() {
 
       if (cardErr) throw cardErr
 
-      // Placeholder image — replaced by the real URL once the model is live
-      const imageUrl = 'https://images.pokemontcg.io/bw6/148_hires.png'
+      const imageUrl = cardImageUrl(card.set_id, card.number)
       await _processCard(imageUrl, card)
 
     } catch (err) {

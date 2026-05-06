@@ -4,7 +4,12 @@ import { useLibraryStore } from './useLibraryStore.js'
 
 export function useAuth() {
   const { setScreen, currentUser, activeScreen, resetButtons } = useAppState()
-  const { loadScans } = useLibraryStore()
+  const { loadLibrary, loadScans } = useLibraryStore()
+
+  function loadUserData() {
+    loadLibrary()
+    loadScans()
+  }
 
   // ---Check for an existing session on app load---
   async function checkSession() {
@@ -12,7 +17,7 @@ export function useAuth() {
     if (session?.user) {
       currentUser.value = session.user
       setScreen(null)
-      loadScans()
+      loadUserData()
     } else {
       // ---Show welcome screen first, then slide into login---
       setScreen('welcome')
@@ -26,7 +31,7 @@ export function useAuth() {
   function _bootSequence(user) {
     currentUser.value = user   // triggers app brightening transition immediately
     setScreen('booting')
-    loadScans()
+    loadUserData()
     setTimeout(() => {
       if (activeScreen.value === 'booting') setScreen('default')
     }, 2000)

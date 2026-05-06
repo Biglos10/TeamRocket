@@ -23,7 +23,6 @@
           <ProfileSettingsScreen     v-else-if="activeScreen === 'profile-settings'" />
           <AccessibilitySettingsScreen v-else-if="activeScreen === 'accessibility-settings'" />
           <ApplicationSettingsScreen v-else-if="activeScreen === 'application-settings'" />
-          <RotomScreen               v-else-if="activeScreen === 'rotom'" />
         </div>
       </div>
       <div class="camera-button" :class="{ 'chrome-dimmed': !currentUser }">
@@ -157,7 +156,6 @@ import UserSettingsScreen from './CCScreens/UserSettingsScreen.vue'
 import ProfileSettingsScreen from './CCScreens/ProfileSettingsScreen.vue'
 import AccessibilitySettingsScreen from './CCScreens/AccessibilitySettingsScreen.vue'
 import ApplicationSettingsScreen from './CCScreens/ApplicationSettingsScreen.vue'
-import RotomScreen from './CCScreens/RotomScreen.vue'
 
 const { activeScreen, currentUser } = useAppState()
 </script>

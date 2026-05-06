@@ -8,9 +8,9 @@ import { useLibraryStore } from './useLibraryStore.js'
 const saving = ref(false)
 
 export function useCardConfirmation() {
-  const { confirmStep, pendingCardId, pendingCard, pendingImageUrl, currentUser, scannedCard } = useAppState()
+  const { confirmStep, pendingCardId, pendingCard, pendingImageUrl, pendingLibraryId, currentUser, scannedCard } = useAppState()
   const { fetchCardData } = useCardScanner()
-  const { loadScans } = useLibraryStore()
+  const { loadLibrary, loadScans } = useLibraryStore()
 
   // ── Step 1: user answers "Is this correct?" ──────────────────────────────
   async function answerScan(isCorrect) {
@@ -51,18 +51,23 @@ export function useCardConfirmation() {
     if (saving.value) return
     saving.value = true
 
-    const { error: libErr } = await supabase.from('library').insert({
-      user_id: currentUser.value?.id,
-      card_id: pendingCardId.value,
-      tag:     isOwned ? 'owned' : 'unowned',
-    })
-    if (libErr) console.error('[Confirmation] library insert', libErr)
+    const tag = isOwned ? 'owned' : 'unowned'
+    const libErr = pendingLibraryId.value
+      ? (await supabase.from('library').update({ tag }).eq('id', pendingLibraryId.value)).error
+      : (await supabase.from('library').insert({
+          user_id: currentUser.value?.id,
+          card_id: pendingCardId.value,
+          tag,
+        })).error
+    if (libErr) console.error('[Confirmation] library write', libErr)
 
-    saving.value          = false
-    confirmStep.value     = null
-    pendingCardId.value   = null
-    pendingCard.value     = null
-    pendingImageUrl.value = null
+    saving.value           = false
+    loadLibrary()
+    confirmStep.value      = null
+    pendingCardId.value    = null
+    pendingCard.value      = null
+    pendingImageUrl.value  = null
+    pendingLibraryId.value = null
   }
 
   // ── Abandonment: called when user navigates away mid-flow ─────────────────
@@ -82,18 +87,23 @@ export function useCardConfirmation() {
       loadScans()
 
     } else if (confirmStep.value === 'ownership') {
-      const { error: libErr } = await supabase.from('library').insert({
-        user_id: currentUser.value?.id,
-        card_id: pendingCardId.value,
-        tag:     'unowned',
-      })
-      if (libErr) console.error('[Confirmation] abandon-ownership insert', libErr)
+      // Re-scan abandon: existing row is already 'unowned', no write needed.
+      if (!pendingLibraryId.value) {
+        const { error: libErr } = await supabase.from('library').insert({
+          user_id: currentUser.value?.id,
+          card_id: pendingCardId.value,
+          tag:     'unowned',
+        })
+        if (libErr) console.error('[Confirmation] abandon-ownership insert', libErr)
+        loadLibrary()
+      }
     }
 
-    confirmStep.value     = null
-    pendingCardId.value   = null
-    pendingCard.value     = null
-    pendingImageUrl.value = null
+    confirmStep.value      = null
+    pendingCardId.value    = null
+    pendingCard.value      = null
+    pendingImageUrl.value  = null
+    pendingLibraryId.value = null
   }
 
   return { saving, answerScan, answerOwnership, abandonConfirmation }

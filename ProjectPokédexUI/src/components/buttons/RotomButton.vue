@@ -1,5 +1,5 @@
 <template>
-  <svg width="109" height="109" viewBox="0 0 109 109" fill="none" xmlns="http://www.w3.org/2000/svg" @click="isOn = !isOn" :class="{ 'is-on': isOn }">
+  <svg width="109" height="109" viewBox="0 0 109 109" fill="none" xmlns="http://www.w3.org/2000/svg" :class="{ 'is-on': isOn }">
     <circle cx="54.2729" cy="54.2729" r="39.5" fill="url(#paint0_radial_129_1280)" stroke="black" stroke-width="3"/>
     <path d="M54.4844 74.1086L55.6429 81.7148C55.34 81.8129 54.9541 81.9254 54.5081 82.0235C53.366 82.2747 51.8923 82.4269 50.4431 82.1032C48.9379 81.767 47.5637 81.0989 46.552 80.5002C46.2005 80.2923 45.8987 80.0921 45.6535 79.9244L49.6538 73.262L54.4844 74.1086Z" fill="url(#paint1_radial_129_1280)" stroke="black" stroke-width="2"/>
     <path d="M35.6254 66.7037C36.2634 66.7439 37.0041 67.0736 37.9666 67.6801C38.4367 67.9764 38.9265 68.3164 39.4606 68.6875C39.9884 69.0543 40.5558 69.4482 41.1529 69.8308C42.0276 70.3913 42.9897 70.9403 44.05 71.3746L40.3829 77.4827C38.0472 75.8945 36.1836 73.6943 35.0083 71.6727C34.3518 70.5435 33.9342 69.5128 33.758 68.7202C33.6698 68.323 33.6514 68.0238 33.6706 67.8215C33.688 67.6393 33.7284 67.5993 33.7144 67.617C34.4623 66.8435 35.0732 66.6689 35.6254 66.7037Z" fill="url(#paint2_radial_129_1280)" stroke="black" stroke-width="2"/>
@@ -69,6 +69,7 @@ svg.is-on:active {
 </style>
 
 <script setup>
-import { ref } from 'vue'
-const isOn = ref(false)
+defineProps({
+  isOn: { type: Boolean, default: false },
+})
 </script>

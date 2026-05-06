@@ -9,18 +9,22 @@
       </svg>
       <div class="app-label">Pokédex</div>
       <div class="lcd-display">
+        <div v-if="hasOutput" class="rotom-output">
+          <div v-if="lastQuery" class="output-query">{{ lastQuery }}</div>
+          <div class="output-body">
+            <span v-if="errorMessage" class="output-error">{{ errorMessage }}</span>
+            <template v-else>{{ lastResponse }}<span v-if="isLoading" class="output-cursor">▮</span></template>
+          </div>
+        </div>
         <textarea
           class="rotom-input"
-          :class="{ focused: isFocused }"
           :placeholder="isLoading ? 'Rotom is thinking...' : 'Ask Rotom...'"
           v-model="query"
           :disabled="isLoading"
-          @focus="isFocused = true"
-          @blur="isFocused = false"
           @keydown.enter.exact.prevent="submit"
         />
       </div>
-      <div class="rotom-button"><RotomButton @click="submit"/></div>
+      <div class="rotom-button"><RotomButton :is-on="isSpeaking || isLoading" @click="rotomPress"/></div>
     </div>
   </div>
 </template>
@@ -92,23 +96,69 @@
   top: -12px;
 }
 
+.rotom-output {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  font-family: 'Jura', sans-serif;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #E3F4EE;
+  margin-bottom: 4px;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: #2FABD0 transparent;
+}
+.rotom-output::-webkit-scrollbar { width: 3px; }
+.rotom-output::-webkit-scrollbar-thumb { background: #2FABD0; border-radius: 2px; }
+
+.output-query {
+  font-family: 'Iceland', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #FFD624;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.output-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.output-error {
+  color: #FF8A82;
+}
+
+.output-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: #7FD9C2;
+  animation: rotom-blink 1s steps(1) infinite;
+}
+
+@keyframes rotom-blink {
+  50% { opacity: 0; }
+}
+
 .rotom-input {
+  flex-shrink: 0;
   width: 100%;
-  height: 16px;
+  height: 18px;
   background: #101F13;
-  border: 1.5px, solid #A2A3B1;
+  border: 1.5px solid #A2A3B1;
   border-radius: 2.5px;
   resize: none;
   overflow: hidden;
   font-family: 'Jura', sans-serif;
-  font-style: normal;
   font-weight: 400;
   font-size: 12px;
   line-height: 14px;
   color: #FFFFFF;
   outline: none;
   -webkit-tap-highlight-color: transparent;
-  transition: height 0.25s ease;
   box-sizing: border-box;
   padding: 1px 4px;
 }
@@ -116,21 +166,22 @@
 .rotom-input::placeholder {
   color: rgba(214, 244, 255, 0.51);
 }
-
-.rotom-input.focused {
-  height: 78px;
-  overflow: auto;
-}
 </style>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import RotomButton from './buttons/RotomButton.vue'
 import { useRotom } from '../composables/useRotom'
 
-const isFocused = ref(false)
 const query = ref('')
-const { ask, isLoading } = useRotom()
+const {
+  ask, isLoading, isSpeaking, rotomPress,
+  lastQuery, lastResponse, errorMessage,
+} = useRotom()
+
+const hasOutput = computed(() =>
+  Boolean(lastQuery.value || lastResponse.value || errorMessage.value || isLoading.value)
+)
 
 async function submit() {
   const text = query.value.trim()
