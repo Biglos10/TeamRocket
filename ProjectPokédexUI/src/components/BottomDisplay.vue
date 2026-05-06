@@ -12,12 +12,15 @@
         <textarea
           class="rotom-input"
           :class="{ focused: isFocused }"
-          placeholder="Ask Rotom..."
+          :placeholder="isLoading ? 'Rotom is thinking...' : 'Ask Rotom...'"
+          v-model="query"
+          :disabled="isLoading"
           @focus="isFocused = true"
           @blur="isFocused = false"
+          @keydown.enter.exact.prevent="submit"
         />
       </div>
-      <div class="rotom-button"><RotomButton/></div>
+      <div class="rotom-button"><RotomButton @click="submit"/></div>
     </div>
   </div>
 </template>
@@ -123,6 +126,16 @@
 <script setup>
 import { ref } from 'vue'
 import RotomButton from './buttons/RotomButton.vue'
+import { useRotom } from '../composables/useRotom'
 
 const isFocused = ref(false)
+const query = ref('')
+const { ask, isLoading } = useRotom()
+
+async function submit() {
+  const text = query.value.trim()
+  if (!text || isLoading.value) return
+  query.value = ''
+  await ask(text)
+}
 </script>
