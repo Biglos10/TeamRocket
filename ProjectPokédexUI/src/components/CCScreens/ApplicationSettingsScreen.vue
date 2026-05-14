@@ -3,10 +3,17 @@
     <h1 class="title">APPLICATION</h1>
 
     <div class="row">
+      <span class="label">Rotom provider</span>
+      <select class="select" v-model="provider">
+        <option value="claude">Claude (Anthropic)</option>
+        <option value="gemini">Gemini (Google)</option>
+      </select>
+    </div>
+
+    <div class="row">
       <span class="label">Rotom model</span>
       <select class="select" v-model="model">
-        <option value="gemini-2.5-flash">Flash (fast)</option>
-        <option value="gemini-2.5-pro">Pro (smart)</option>
+        <option v-for="m in availableModels" :key="m.id" :value="m.id">{{ m.label }}</option>
       </select>
     </div>
 
@@ -45,15 +52,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { supabase } from '../../lib/supabase.js'
 import { useAppState } from '../../composables/useAppState.js'
 import { useLibraryStore } from '../../composables/useLibraryStore.js'
 import { useSettings } from '../../composables/useSettings.js'
+import { CLAUDE_MODELS } from '../../lib/claude.js'
+import { GEMINI_MODELS } from '../../lib/gemini.js'
 
 const { currentUser } = useAppState()
 const { loadLibrary, loadScans } = useLibraryStore()
-const { model } = useSettings()
+const { provider, model } = useSettings()
+
+const availableModels = computed(() =>
+  provider.value === 'gemini' ? GEMINI_MODELS : CLAUDE_MODELS,
+)
 
 const version = '1.0.0'
 const email = currentUser.value?.email ?? '—'
@@ -108,7 +121,8 @@ async function clearScans() {
     if (error) throw error
     await loadScans()
   } catch (err) {
-    clearError.value = err?.message || 'Delete failed'
+    console.error('[AppSettings] clearScans', err)
+    clearError.value = 'Could not clear scan history. Try again.'
   } finally {
     clearing.value = false
   }

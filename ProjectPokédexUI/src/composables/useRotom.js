@@ -1,5 +1,8 @@
 import { ref, watch } from 'vue'
-import { gemini, ROTOM_SYSTEM_INSTRUCTION } from '../lib/gemini'
+import { claude } from '../lib/claude'
+import { gemini } from '../lib/gemini'
+import { ROTOM_SYSTEM_INSTRUCTION } from '../lib/rotomPrompt'
+import { friendlyRotomError } from '../lib/errors'
 import { useAppState } from './useAppState'
 import { useSettings } from './useSettings'
 
@@ -10,7 +13,7 @@ const errorMessage = ref('')
 const isSpeaking   = ref(false)
 
 const { scannedCard, cardMeta } = useAppState()
-const { autoSpeakAnswers, autoSpeakBio, rate, pitch, voiceURI, voices, model } = useSettings()
+const { autoSpeakAnswers, autoSpeakBio, rate, pitch, voiceURI, voices, provider, model } = useSettings()
 
 function stopSpeaking() {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
@@ -44,6 +47,33 @@ function toggleSpeak() {
   else speak()
 }
 
+async function streamClaude(prompt) {
+  // Stream the Messages API. System instruction sits in a cache_control block so
+  // repeated Rotom calls reuse the prefix (cache kicks in once the system text
+  // crosses the model's minimum cacheable prefix; harmless below it).
+  const stream = claude.messages.stream({
+    model: model.value,
+    max_tokens: 1024,
+    system: [
+      {
+        type: 'text',
+        text: ROTOM_SYSTEM_INSTRUCTION,
+        cache_control: { type: 'ephemeral' },
+      },
+    ],
+    messages: [{ role: 'user', content: prompt }],
+  })
+
+  for await (const event of stream) {
+    if (
+      event.type === 'content_block_delta' &&
+      event.delta.type === 'text_delta'
+    ) {
+      lastResponse.value += event.delta.text
+    }
+  }
+}
+
 async function streamGemini(prompt) {
   const stream = await gemini.models.generateContentStream({
     model: model.value,
@@ -53,6 +83,11 @@ async function streamGemini(prompt) {
   for await (const chunk of stream) {
     if (chunk.text) lastResponse.value += chunk.text
   }
+}
+
+async function streamRotom(prompt) {
+  if (provider.value === 'gemini') return streamGemini(prompt)
+  return streamClaude(prompt)
 }
 
 async function ask(query) {
@@ -66,10 +101,10 @@ async function ask(query) {
   isLoading.value    = true
 
   try {
-    await streamGemini(trimmed)
+    await streamRotom(trimmed)
     if (autoSpeakAnswers.value) speak()
   } catch (err) {
-    errorMessage.value = err?.message || 'Rotom is offline.'
+    errorMessage.value = friendlyRotomError(err)
   } finally {
     isLoading.value = false
   }
@@ -87,10 +122,10 @@ async function describePokemon(name) {
   const prompt = `Give a Pokédex entry for ${name}. Speak about the Pokémon species itself, not the trading card variant. Keep it under 60 words. Plain prose only — this will be read aloud.`
 
   try {
-    await streamGemini(prompt)
+    await streamRotom(prompt)
     speak()
   } catch (err) {
-    errorMessage.value = err?.message || 'Rotom is offline.'
+    errorMessage.value = friendlyRotomError(err)
   } finally {
     isLoading.value = false
   }

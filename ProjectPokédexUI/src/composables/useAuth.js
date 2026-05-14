@@ -4,11 +4,12 @@ import { useLibraryStore } from './useLibraryStore.js'
 
 export function useAuth() {
   const { setScreen, currentUser, activeScreen, resetButtons } = useAppState()
-  const { loadLibrary, loadScans } = useLibraryStore()
+  const { loadLibrary, loadScans, loadSetsCatalog } = useLibraryStore()
 
   function loadUserData() {
     loadLibrary()
     loadScans()
+    loadSetsCatalog()
   }
 
   // ---Check for an existing session on app load---

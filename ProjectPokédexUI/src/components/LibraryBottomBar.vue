@@ -17,7 +17,7 @@
 
     <!-- Buttons -->
     <div class="btn-row">
-      <LibraryBtn2 class="center-btn" @select="emit('rotom')" />
+      <LibraryBtn2 class="center-btn" @select="emit('sets')" />
       <LibraryBtn1 class="side-btn" @select="emit('library')" />
       <LibraryBtn3 class="side-btn" @select="emit('scans')" />
     </div>
@@ -29,7 +29,7 @@ import LibraryBtn1 from './buttons/LibraryBtn1.vue'
 import LibraryBtn2 from './buttons/LibraryBtn2.vue'
 import LibraryBtn3 from './buttons/LibraryBtn3.vue'
 
-const emit = defineEmits(['library', 'rotom', 'scans'])
+const emit = defineEmits(['library', 'sets', 'scans'])
 
 defineProps({
   sliding: {

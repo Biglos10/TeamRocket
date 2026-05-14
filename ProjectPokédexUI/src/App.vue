@@ -4,6 +4,7 @@
     <CenterConsole />
     <BottomDisplay class="ui-transition" :class="{ 'ui-dimmed': !currentUser }" />
     <LibraryPanel  :class="{ 'ui-dimmed': !currentUser }" />
+    <WelcomeOverlay />
   </div>
 </template>
 
@@ -13,6 +14,7 @@ import TopBar        from './components/TopBar.vue'
 import CenterConsole from './components/CenterConsole.vue'
 import BottomDisplay from './components/BottomDisplay.vue'
 import LibraryPanel  from './components/LibraryPanel.vue'
+import WelcomeOverlay from './components/WelcomeOverlay.vue'
 import { useAuth }     from './composables/useAuth.js'
 import { useAppState } from './composables/useAppState.js'
 

@@ -12,16 +12,16 @@
     <!-- Center screen — expands downward in sync with bottom bar -->
     <div class="library-screen" :class="{ visible: bottomVisible }">
       <!-- Scrollable card/scan content -->
-      <LibraryContent :mode="panelMode" :active-filter="activeFilter" />
+      <LibraryContent :mode="panelMode" :active-filter="activeFilter" @select-card="onSelectCard" />
 
       <!-- Filter buttons — centered, flush together -->
-      <div class="filter-group" :class="{ visible: bottomVisible }">
+      <div v-if="showFilters" class="filter-group" :class="{ visible: bottomVisible }">
         <FilterBtn1 :is-on="activeFilter === 'owned'"   :label="filterLabel1" @select="activeFilter = activeFilter === 'owned' ? null : 'owned'" />
         <FilterBtn2 :is-on="activeFilter === 'unowned'" :label="filterLabel2" @select="activeFilter = activeFilter === 'unowned' ? null : 'unowned'" />
       </div>
     </div>
 
-    <LibraryBottomBar :sliding="isOpen" :visible="bottomVisible" @library="setMode('library')" @scans="setMode('scans')" />
+    <LibraryBottomBar :sliding="isOpen" :visible="bottomVisible" @library="setMode('library')" @scans="setMode('scans')" @sets="setMode('sets')" />
 
     <div class="panel-bar">
       <span class="panel-title">{{ panelTitle }}</span>
@@ -60,19 +60,39 @@ import FilterBtn1 from './buttons/FilterBtn1.vue'
 import FilterBtn2 from './buttons/FilterBtn2.vue'
 import LibraryContent from './LibraryContent.vue'
 import { useAppState } from '../composables/useAppState'
+import { useCardScanner } from '../composables/useCardScanner'
+import { useLibraryStore } from '../composables/useLibraryStore'
 
 const { currentUser } = useAppState()
+const { viewCard } = useCardScanner()
+const { selectedSetId, clearSetDetail } = useLibraryStore()
+
+function onSelectCard(card) {
+  viewCard(card.cardId, card.image)
+  closePanel()
+}
 
 const emit = defineEmits(['owned', 'unowned'])
 
-const panelMode     = ref('library')   // 'library' | 'scans'
-const panelTitle    = computed(() => panelMode.value === 'scans' ? 'Scans' : 'Library')
+const panelMode     = ref('library')   // 'library' | 'scans' | 'sets'
+const panelTitle    = computed(() => {
+  if (panelMode.value === 'scans') return 'Scans'
+  if (panelMode.value === 'sets')  return selectedSetId.value ? 'Set' : 'Sets'
+  return 'Library'
+})
 const filterLabel1  = computed(() => panelMode.value === 'scans' ? 'Known'   : 'Owned')
 const filterLabel2  = computed(() => panelMode.value === 'scans' ? 'Unknown' : 'Unowned')
+
+// Hide the Owned/Unowned buttons in the sets grid (they're irrelevant there);
+// keep them when drilled into a specific set.
+const showFilters = computed(() =>
+  panelMode.value !== 'sets' || !!selectedSetId.value,
+)
 
 function setMode(mode) {
   panelMode.value = mode
   activeFilter.value = null   // reset filter selection on mode switch
+  if (mode !== 'sets') clearSetDetail()
 }
 const panelRef      = ref(null)
 const isDragging    = ref(false)

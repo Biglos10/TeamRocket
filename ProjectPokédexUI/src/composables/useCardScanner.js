@@ -105,22 +105,32 @@ export function useCardScanner() {
     scanStatus.value = 'idle'
   }
 
-  // ── Real scan: POST image to API → query by name ───────────────────────────
+  // ── Real scan: POST image to TeamRocket /upload/ → look up by id ──────────
+  // API contract:
+  //   POST {file: image} → { URL: <imagekit url>, FileName: <set>-<num> }
+  //   On match failure the API returns 200 with { error: "<message>" }.
+  // FileName matches cardinfo.id exactly (e.g. "sv1-100").
   async function scanImage(blob) {
     scanStatus.value = 'scanning'
     try {
+      if (!API_URL) throw new Error('VITE_API_URL is not set')
+
       const formData = new FormData()
       formData.append('file', blob, 'capture.png')
 
       const apiRes = await fetch(API_URL, { method: 'POST', body: formData })
       if (!apiRes.ok) throw new Error(`API ${apiRes.status}`)
 
-      const { URL: imageUrl, FileName: cardName } = await apiRes.json()
+      const body = await apiRes.json()
+      if (body?.error) throw new Error(body.error)
+
+      const { URL: imageUrl, FileName: cardId } = body
+      if (!cardId) throw new Error('API response missing FileName')
 
       const { data: card, error: cardErr } = await supabase
         .from('cardinfo')
         .select('*')
-        .eq('card_name', cardName)
+        .eq('id', cardId)
         .single()
 
       if (cardErr) throw cardErr
@@ -153,5 +163,41 @@ export function useCardScanner() {
     }
   }
 
-  return { scanImage, mockScan, scanStatus, fetchCardData }
+  // ── View an existing library card (no confirmation, just display) ─────────
+  async function viewCard(cardId, imageUrl) {
+    scanStatus.value = 'scanning'
+    try {
+      const { data: card, error } = await supabase
+        .from('cardinfo')
+        .select('*')
+        .eq('id', cardId)
+        .single()
+      if (error) throw error
+
+      card.subtypes      = toArray(card.subtypes)
+      card.pokemon_types = toArray(card.pokemon_types)
+      card.retreat_cost  = toArray(card.retreat_cost)
+
+      const finalImageUrl = imageUrl || cardImageUrl(card.set_id, card.number)
+      scannedCard.value = { imageUrl: finalImageUrl, name: card.card_name }
+
+      await fetchCardData(card)
+
+      confirmStep.value      = null
+      pendingCardId.value    = null
+      pendingCard.value      = null
+      pendingImageUrl.value  = null
+      pendingLibraryId.value = null
+
+      profileActive.value  = false
+      activeSettings.value = 1
+      setScreen('card-viewer')
+      scanStatus.value = 'idle'
+    } catch (err) {
+      console.error('[CardScanner] viewCard', err)
+      scanStatus.value = 'error'
+    }
+  }
+
+  return { scanImage, mockScan, viewCard, scanStatus, fetchCardData }
 }

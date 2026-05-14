@@ -33,7 +33,7 @@
         pointer-events="painted"
       />
     </svg>
-    <span class="lib-label">Rotom</span>
+    <span class="lib-label">Sets</span>
   </div>
 </template>
 
